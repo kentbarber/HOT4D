@@ -719,17 +719,8 @@ Bool OceanSimulationDeformer::ModifyObject(BaseObject *mod, BaseDocument *doc, B
 
 }
 
-
-
-// be sure to use a unique ID obtained from www.plugincafe.com
-#define ID_OCEAN_SIMULATION_DEFORMER 1051458
-Bool RegisterOceanSimulationDeformer();
+#define GLD_ID_OCEAN_SIMULATION_DEFORMER 1057479
 Bool RegisterOceanSimulationDeformer()
 {
-
-	return RegisterObjectPlugin(ID_OCEAN_SIMULATION_DEFORMER, "HOT 4D"_s, OBJECT_MODIFIER, OceanSimulationDeformer::Alloc, "OOceanDeformer"_s, AutoBitmap("hot4D.tif"_s), 0);
-	
+	return RegisterObjectPlugin(GLD_ID_OCEAN_SIMULATION_DEFORMER, "HOT 4D"_s, OBJECT_MODIFIER, OceanSimulationDeformer::Alloc, "OOceanDeformer"_s, AutoBitmap("hot4D.tif"_s), 0);
 }
-
-// helpers
-

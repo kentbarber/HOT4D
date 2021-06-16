@@ -1,6 +1,5 @@
 CONTAINER OceanDescription
 {
-	
 	GROUP ID_OCEAN_DESCRIPTION
 	{
       NAME OceanDescription;

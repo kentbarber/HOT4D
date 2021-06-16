@@ -2,22 +2,11 @@
 #include "c4d.h"
 #include "c4d_symbols.h"
 #include "c4d_baseeffectordata.h"
-
-
-// #include "c4d_baseeffectorplugin.h"
-
-
-
 #include "OceanDescription.h"
 #include "OceanSimulation/OceanSimulation_decl.h"
-
-
-
-
 #include "OceanSimulationEffector.h"
 
-
-#define ID_OCEAN_SIMULATION_EFFECTOR 1051489
+#define GLD_ID_OCEAN_SIMULATION_EFFECTOR 1057480
 
 Bool OceanSimulationEffector::GetDEnabling(GeListNode *node, const DescID &id, const GeData &t_data, DESCFLAGS_ENABLE flags, const BaseContainer *itemdesc)
 {
@@ -305,12 +294,9 @@ Vector OceanSimulationEffector::CalcPointColor(BaseObject* op, BaseObject* gen, 
 
 
 
-Bool RegisterOceanSimulationEffector();
 Bool RegisterOceanSimulationEffector()
-
 {
-	return RegisterEffectorPlugin(ID_OCEAN_SIMULATION_EFFECTOR, "Ocean Simulation Effector"_s, OBJECT_CALL_ADDEXECUTION,
-									OceanSimulationEffector::Alloc, "OOceanEffector"_s, AutoBitmap("hot4D_eff.tif"_s), 0);
+	return RegisterEffectorPlugin(GLD_ID_OCEAN_SIMULATION_EFFECTOR, "Ocean Simulation Effector"_s, OBJECT_CALL_ADDEXECUTION, OceanSimulationEffector::Alloc, "OOceanEffector"_s, AutoBitmap("hot4D_eff.tif"_s), 0);
 }
 
 

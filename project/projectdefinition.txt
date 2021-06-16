@@ -18,4 +18,4 @@ stylecheck.enum-class=false
 
 
 // Custom ID
-ModuleId=com.valkaari.hot4D
+ModuleId=com.gamelogicdesign.hot4D
