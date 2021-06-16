@@ -9,9 +9,9 @@ APIS=cinema.framework;math.framework;core.framework;misc.framework;
 
 // C4D component
 C4D=true
-stylecheck.level=3 // must be set after c4d=true
-stylecheck.enum-registration=false
-stylecheck.enum-class=false
+//stylecheck.level=3 // must be set after c4d=true
+//stylecheck.enum-registration=false
+//stylecheck.enum-class=false
 
 
 
