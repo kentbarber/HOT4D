@@ -759,7 +759,7 @@ namespace OceanSimulation
 			KissFFT.Transform2D(fftin_, dispY_, fft_flags_) iferr_return;
 
 
-			maxon::Float maxHeight = maxon::MINRANGE_FLOAT64;
+			maxon::Float maxHeight = maxon::MINRANGE_FLOAT;
 
 			// avoid using parallel loop to get max value.
 			for (maxon::Int32 i = 0; i < dispY_.GetXCount(); i++)
