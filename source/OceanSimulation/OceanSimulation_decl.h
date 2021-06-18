@@ -23,7 +23,7 @@ namespace OceanSimulation {
 
 	class OceanInterface : MAXON_INTERFACE_BASES(maxon::Object)
 	{
-		MAXON_INTERFACE(OceanInterface, MAXON_REFERENCE_NORMAL, "com.valkaari.OceanSimulation.interfaces.ocean");
+		MAXON_INTERFACE(OceanInterface, MAXON_REFERENCE_NORMAL, "com.gamelogicdesign.OceanSimulation.interfaces.ocean");
 
 	public: 
 		
@@ -96,7 +96,7 @@ namespace OceanSimulation {
 
 #include "OceanSimulation_decl1.hxx"
 
-	MAXON_DECLARATION(maxon::Class<OceanRef>, Ocean, "com.valkaari.OceanSimulation.ocean");
+	MAXON_DECLARATION(maxon::Class<OceanRef>, Ocean, "com.gamelogicdesign.OceanSimulation.ocean");
 
 #include "OceanSimulation_decl2.hxx"
 

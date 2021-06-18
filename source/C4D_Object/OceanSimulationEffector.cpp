@@ -3,7 +3,7 @@
 #include "c4d_symbols.h"
 #include "c4d_baseeffectordata.h"
 #include "OceanDescription.h"
-#include "OceanSimulation/OceanSimulation_decl.h"
+#include "OceanSimulation_decl.h"
 #include "OceanSimulationEffector.h"
 
 #define GLD_ID_OCEAN_SIMULATION_EFFECTOR 1057480
@@ -149,7 +149,7 @@ void OceanSimulationEffector::InitPoints(BaseObject* op, BaseObject* gen, BaseDo
 
 	maxon::Float					oceanSize, windSpeed, windDirection, shrtWaveLenght, waveHeight, chopAmount, dampReflection, windAlign, oceanDepth, timeScale;
 	maxon::Int32					oceanResolution, seed, timeLoop;
-	maxon::Bool						doJacobian, doChopyness, doAutoTime;
+	maxon::Bool						doChopyness, doAutoTime;
 
 	GeData							uiData;
 	op->GetParameter(DescID(OCEAN_RESOLUTION), uiData, DESCFLAGS_GET::NONE);

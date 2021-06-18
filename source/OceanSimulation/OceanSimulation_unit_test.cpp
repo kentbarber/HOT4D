@@ -150,7 +150,7 @@ namespace OceanSimulation
 	};
 
 
-	MAXON_COMPONENT_CLASS_REGISTER(SimpleOceanSimulationUnitTest, maxon::UnitTestClasses, "com.valkaari.OceanSimulation.unittest.SimpleOceanSimulation");
-	MAXON_COMPONENT_CLASS_REGISTER(SimpleOceanSimulationSpeedTest, maxon::SpeedTestClasses, "com.valkaari.OceanSimulation.unittest.SimpleOceanSimulationSpeed");
+	MAXON_COMPONENT_CLASS_REGISTER(SimpleOceanSimulationUnitTest, maxon::UnitTestClasses, "com.gamelogicdesign.OceanSimulation.unittest.SimpleOceanSimulation");
+	MAXON_COMPONENT_CLASS_REGISTER(SimpleOceanSimulationSpeedTest, maxon::SpeedTestClasses, "com.gamelogicdesign.OceanSimulation.unittest.SimpleOceanSimulationSpeed");
 }
 	
