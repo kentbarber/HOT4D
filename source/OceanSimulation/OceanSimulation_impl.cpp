@@ -234,8 +234,7 @@ namespace OceanSimulation
 			maxon::ParallelFor::Dynamic(0, M_ * N_, prepareDisp);*/
 			
 			
-			
-			maxon::Int titleSize = M_ / GeGetCurrentThreadCount();
+			maxon::Int titleSize = maxon::Max(1, M_ / GeGetCurrentThreadCount());
 
 			auto prepareDisp = [&currentTime, &timeScale, this](maxon::Int i, maxon::Int j)
 			{
