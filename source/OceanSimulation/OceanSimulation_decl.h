@@ -6,7 +6,7 @@
 // Ensuring backwards compatiblity with R20 by the continued use of maxon::Object instead of maxon::ObjectInterface
 namespace maxon 
 {
-	using Object = maxon::ObjectInterface;
+	using Object = ObjectInterface;
 }
 #endif
 
