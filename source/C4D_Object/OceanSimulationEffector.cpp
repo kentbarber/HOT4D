@@ -5,6 +5,7 @@
 #include "OceanDescription.h"
 #include "OceanSimulation_decl.h"
 #include "OceanSimulationEffector.h"
+#include "main.h"
 
 #define GLD_ID_OCEAN_SIMULATION_EFFECTOR 1057480
 

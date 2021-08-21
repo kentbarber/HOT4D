@@ -25,7 +25,7 @@
 #include "OOceanDeformer.h"
 #include "description/OceanDescription.h"
 
-
+#include "main.h"
 
 maxon::Float OceanSimulationDeformer::MapRange(maxon::Float value, const maxon::Float min_input, const maxon::Float max_input, const maxon::Float min_output, const maxon::Float max_output) const
 {
