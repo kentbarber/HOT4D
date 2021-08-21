@@ -5,6 +5,10 @@
 #include "maxon/vector.h"
 #include "maxon/vector2d.h"
 
+namespace maxon 
+{
+	using Object = ObjectInterface;
+}
 
 namespace OceanSimulation {
 	//----------------------------------------------------------------------------------------
