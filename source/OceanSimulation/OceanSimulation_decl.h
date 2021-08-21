@@ -7,7 +7,7 @@
 
 namespace maxon 
 {
-	using Object = ObjectInterface;
+	using Object = maxon::ObjectInterface;
 }
 
 namespace OceanSimulation {
