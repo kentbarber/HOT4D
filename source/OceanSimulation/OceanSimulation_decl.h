@@ -1,14 +1,14 @@
-//#include "maxon/commandbase.h"
-//#include "maxon/apibase.h"
-
 #include "maxon/objectbase.h"
 #include "maxon/vector.h"
 #include "maxon/vector2d.h"
 
+#if (MAXON_API_ABI_VERSION > 21000)
+// Ensuring backwards compatiblity with R20 by the continued use of maxon::Object instead of maxon::ObjectInterface
 namespace maxon 
 {
 	using Object = maxon::ObjectInterface;
 }
+#endif
 
 namespace OceanSimulation {
 	//----------------------------------------------------------------------------------------
