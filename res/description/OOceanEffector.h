@@ -3,11 +3,8 @@
 
 enum
 {
-    
   ID_GRP_OCEAN_EFFECTOR = 5000,
-  PROUT
-
-    
+  PROUT    
 };
 
 #endif

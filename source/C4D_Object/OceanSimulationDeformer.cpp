@@ -44,12 +44,76 @@ maxon::Float OceanSimulationDeformer::MapRange(maxon::Float value, const maxon::
 
 Bool OceanSimulationDeformer::Message(GeListNode *node, Int32 type, void *t_data)
 {
+	BaseObject* op = (BaseObject*)node;
+	if (!op)
+		return false;
+
 	switch (type)
 	{
 	case MSG_MENUPREPARE:
 	{
 		((BaseObject*)node)->SetDeformMode(true);
 		break;
+	}
+	case MSG_DESCRIPTION_COMMAND:
+	{
+		DescriptionCommand* dc = (DescriptionCommand*)t_data;
+		switch (dc->_descId[0].id)
+		{
+		case CREATE_FOAM_TAGS:
+		{
+			BaseObject* pParent = op->GetUp();
+			if (pParent && pParent->GetType() == Opolygon)
+			{
+				Int32 pcnt = ToPoint(pParent)->GetPointCount();
+
+				BaseDocument* doc = op->GetDocument();
+				if (doc)
+				{
+					doc->StartUndo();
+
+					VertexColorTag* pJacobTag = VertexColorTag::Alloc(pcnt);
+					if (pJacobTag)
+					{
+						pJacobTag->SetName("Jacob"_s);
+						pJacobTag->SetPerPointMode(true);
+
+						doc->AddUndo(UNDOTYPE::NEWOBJ, pJacobTag);
+						pParent->InsertTag(pJacobTag);
+
+						doc->AddUndo(UNDOTYPE::CHANGE, op);
+						op->SetParameter(JACOBMAP, pJacobTag, DESCFLAGS_SET::FORCESET);
+					}
+
+					VertexColorTag* pFoamTag = VertexColorTag::Alloc(pcnt);
+					if (pFoamTag)
+					{
+						pFoamTag->SetName("Foam"_s);
+						pFoamTag->SetPerPointMode(true);
+
+						doc->AddUndo(UNDOTYPE::NEWOBJ, pFoamTag);
+						pParent->InsertTag(pFoamTag);
+
+						doc->AddUndo(UNDOTYPE::CHANGE, op);
+						op->SetParameter(FOAMMAP, pFoamTag, DESCFLAGS_SET::FORCESET);
+					}
+
+					doc->SetActiveTag(pFoamTag);
+
+					doc->EndUndo();
+					EventAdd();
+
+					pParent->Message(MSG_UPDATE);
+					op->Message(MSG_UPDATE);
+				}
+			}
+			else
+			{
+				MessageDialog("To create the maps please make sure the parent object is editable"_s);
+			}
+		}
+		break;
+		}
 	}
 	default:
 		break;
@@ -153,19 +217,39 @@ DRAWRESULT OceanSimulationDeformer::Draw(BaseObject *op, DRAWPASS drawpass, Base
 
 Bool OceanSimulationDeformer::GetDEnabling(GeListNode *node, const DescID &id, const GeData &t_data, DESCFLAGS_ENABLE flags, const BaseContainer *itemdesc)
 {
-	if (id[0].id == CURRENTTIME)
+	BaseObject* op = (BaseObject*)node;
+	if (!op)
+		return false;
+	BaseContainer* bc = op->GetDataInstance();
+	if (!bc)
+		return false;
+
+	Bool parentIsPolygon = false;
+	BaseObject* pParent = op->GetUp();
+	if (pParent && pParent->GetType() == Opolygon)
 	{
-		// current Time have to be disable if auto anim is on
-		GeData data;
-		node->GetParameter(DescID(AUTO_ANIM_TIME), data, DESCFLAGS_GET::NONE);
-		return !data.GetBool();
+		parentIsPolygon = true;
 	}
 
-	if (id[0].id == PRE_RUN_FOAM)
+	Bool doJacobian = bc->GetBool(DO_JACOBIAN);
+	Bool autoAnimTime = bc->GetBool(AUTO_ANIM_TIME);
+	Bool chopyness = bc->GetBool(DO_CHOPYNESS);
+
+	switch (id[0].id)
 	{
-		GeData data;
-		node->GetParameter(DescID(AUTO_ANIM_TIME), data, DESCFLAGS_GET::NONE);
-		return data.GetBool();
+	case CURRENTTIME:
+		return !autoAnimTime;
+	case JACOBMAP:
+	case JACOB_THRES:
+	case FOAMMAP:
+	case FOAM_THRES:
+		return doJacobian && parentIsPolygon;
+	case CREATE_FOAM_TAGS:
+		return doJacobian;
+	case PRE_RUN_FOAM:
+		return doJacobian && parentIsPolygon && autoAnimTime;
+	case CHOPAMOUNT:
+		return chopyness;
 	}
 
 	return SUPER::GetDEnabling(node, id, t_data, flags, itemdesc);
