@@ -133,30 +133,29 @@ Bool OceanSimulationDeformer::Init(GeListNode *node)
 	BaseObject		*op = (BaseObject*)node;
 	BaseContainer *bc = op->GetDataInstance();
 
-	op->SetParameter(DescID(OCEAN_RESOLUTION), GeData(7), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(SEED), GeData(12345), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(OCEAN_SIZE), GeData(400.0), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(WIND_SPEED), GeData(20.0), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(WIND_DIRECTION), GeData(120.0), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(SHRT_WAVELENGHT), GeData(0.01), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(WAVE_HEIGHT), GeData(30.0), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(CHOPAMOUNT), GeData(0.5), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(DAMP_REFLECT), GeData(1.0), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(WIND_ALIGNMENT), GeData(1.0), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(OCEAN_DEPTH), GeData(200.0), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(CURRENTTIME), GeData(0.0), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(TIMELOOP), GeData(90), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(TIMESCALE), GeData(0.5), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(AUTO_ANIM_TIME), GeData(true), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(PRE_RUN_FOAM), GeData(false), DESCFLAGS_SET::NONE);  // should be false by default
-	op->SetParameter(DescID(DO_CATMU_INTER), GeData(false), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(DO_JACOBIAN), GeData(false), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(DO_CHOPYNESS), GeData(true), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(PSEL_THRES), GeData(0.1), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(JACOB_THRES), GeData(0.5), DESCFLAGS_SET::NONE);
-	op->SetParameter(DescID(FOAM_THRES), GeData(0.03), DESCFLAGS_SET::NONE);
-
-	op->SetParameter(DescID(ACTIVE_DEFORM), GeData(true), DESCFLAGS_SET::NONE);
+	bc->SetInt32(OCEAN_RESOLUTION, 7);
+	bc->SetInt32(SEED, 12345);
+	bc->SetFloat(OCEAN_SIZE, 400.0);
+	bc->SetFloat(WIND_SPEED, 20.0);
+	bc->SetFloat(WIND_DIRECTION, 120.0);
+	bc->SetFloat(SHRT_WAVELENGHT, 0.01);
+	bc->SetFloat(WAVE_HEIGHT, 30.0);
+	bc->SetFloat(CHOPAMOUNT, 0.5);
+	bc->SetFloat(DAMP_REFLECT, 1.0);
+	bc->SetFloat(WIND_ALIGNMENT, 1.0);
+	bc->SetFloat(OCEAN_DEPTH, 200.0);
+	bc->SetFloat(CURRENTTIME, 0.0);
+	bc->SetInt32(TIMELOOP, 90);
+	bc->SetFloat(TIMESCALE, 0.5);
+	bc->SetBool(AUTO_ANIM_TIME, true);
+	bc->SetBool(PRE_RUN_FOAM, false);
+	bc->SetBool(DO_CATMU_INTER, false);
+	bc->SetBool(DO_JACOBIAN, false);
+	bc->SetBool(DO_CHOPYNESS, true);
+	bc->SetFloat(PSEL_THRES, 0.1);
+	bc->SetFloat(JACOB_THRES, 0.5);
+	bc->SetFloat(FOAM_THRES, 0.03);
+	bc->SetBool(ACTIVE_DEFORM, true);
 
 	if (falloff_)
 		if (!falloff_->InitFalloff(bc, NULL, op))
@@ -359,90 +358,42 @@ Bool OceanSimulationDeformer::ModifyObject(BaseObject *mod, BaseDocument *doc, B
 		DeleteMem(weight);
 	};
 
-	mod->GetParameter(DescID(OCEAN_RESOLUTION), data, DESCFLAGS_GET::NONE);
-	oceanResolution = 1 << data.GetInt32();
+	BaseContainer* bc = mod->GetDataInstance();
 
-	mod->GetParameter(DescID(OCEAN_SIZE), data, DESCFLAGS_GET::NONE);
-	oceanSize = data.GetFloat();
-
-	mod->GetParameter(DescID(SHRT_WAVELENGHT), data, DESCFLAGS_GET::NONE);
-	shrtWaveLenght = data.GetFloat();
-
-	mod->GetParameter(DescID(WAVE_HEIGHT), data, DESCFLAGS_GET::NONE);
-	waveHeight = data.GetFloat();
-
-	mod->GetParameter(DescID(WIND_SPEED), data, DESCFLAGS_GET::NONE);
-	windSpeed = data.GetFloat();
-
-	mod->GetParameter(DescID(WIND_DIRECTION), data, DESCFLAGS_GET::NONE);
-	windDirection = DegToRad(data.GetFloat());
-
-	mod->GetParameter(DescID(WIND_ALIGNMENT), data, DESCFLAGS_GET::NONE);
-	windAlign = data.GetFloat();
-
-	mod->GetParameter(DescID(DAMP_REFLECT), data, DESCFLAGS_GET::NONE);
-	dampReflection = data.GetFloat();
-
-	mod->GetParameter(DescID(SEED), data, DESCFLAGS_GET::NONE);
-	seed = data.GetInt32();
-
-	mod->GetParameter(DescID(OCEAN_DEPTH), data, DESCFLAGS_GET::NONE);
-	oceanDepth = data.GetFloat();
-
-	mod->GetParameter(DescID(CHOPAMOUNT), data, DESCFLAGS_GET::NONE);
-	chopAmount = data.GetFloat();
-
-	mod->GetParameter(DescID(TIMELOOP), data, DESCFLAGS_GET::NONE);
-	timeLoop = data.GetInt32();
-
-	mod->GetParameter(DescID(TIMESCALE), data, DESCFLAGS_GET::NONE);
-	timeScale = data.GetFloat();
-
-	mod->GetParameter(DescID(AUTO_ANIM_TIME), data, DESCFLAGS_GET::NONE);
-	doAutoTime = data.GetBool();
+	oceanResolution = 1 << bc->GetInt32(OCEAN_RESOLUTION);
+	oceanSize = bc->GetFloat(OCEAN_SIZE);
+	shrtWaveLenght = bc->GetFloat(SHRT_WAVELENGHT);
+	waveHeight = bc->GetFloat(WAVE_HEIGHT);
+	windSpeed = bc->GetFloat(WIND_SPEED);
+	windDirection = DegToRad(bc->GetFloat(WIND_DIRECTION));
+	windAlign = bc->GetFloat(WIND_ALIGNMENT);
+	dampReflection = bc->GetFloat(DAMP_REFLECT);
+	seed = bc->GetInt32(SEED);
+	oceanDepth = bc->GetFloat(OCEAN_DEPTH);
+	chopAmount = bc->GetFloat(CHOPAMOUNT);
+	timeLoop = bc->GetInt32(TIMELOOP);
+	timeScale = bc->GetFloat(TIMESCALE);
+	doAutoTime = bc->GetBool(AUTO_ANIM_TIME);
 
 	if (!doAutoTime)
 	{
 		// currentTime is set in checkDirty
-		mod->GetParameter(DescID(CURRENTTIME), data, DESCFLAGS_GET::NONE);
-		currentTime_ = data.GetFloat();
+		currentTime_ = bc->GetFloat(CURRENTTIME);
 	}
 
-	mod->GetParameter(DescID(DO_CATMU_INTER), data, DESCFLAGS_GET::NONE);
-	doCatmuInter = data.GetBool();
+	doCatmuInter = bc->GetBool(DO_CATMU_INTER);
+	doJacobian = bc->GetBool(DO_JACOBIAN);
+	doChopyness = bc->GetBool(DO_CHOPYNESS);
+	doNormals = bc->GetBool(DO_NORMALS) && !doChopyness; // why choppyness ???  normals are not used !!
+	preRunFoam = bc->GetBool(PRE_RUN_FOAM);
+	jacobmaptag = (VertexColorTag*)bc->GetLink(JACOBMAP, doc, Tvertexcolor);
+	foammaptag = (VertexColorTag*)bc->GetLink(FOAMMAP, doc, Tvertexcolor);
+	stag = (SelectionTag*)bc->GetLink(PSEL_PARTICLES, doc, Tpointselection);
+	pselThres = bc->GetFloat(PSEL_THRES);
+	jacobThres = bc->GetFloat(JACOB_THRES);
+	foamThres = bc->GetFloat(FOAM_THRES);
 
-	mod->GetParameter(DescID(DO_JACOBIAN), data, DESCFLAGS_GET::NONE);
-	doJacobian = data.GetBool();
-
-	mod->GetParameter(DescID(DO_CHOPYNESS), data, DESCFLAGS_GET::NONE);
-	doChopyness = data.GetBool();
-
-	mod->GetParameter(DescID(DO_NORMALS), data, DESCFLAGS_GET::NONE);
-	doNormals = data.GetBool() && !doChopyness; // why choppyness ???  normals are not used !!
-
-	mod->GetParameter(DescID(PRE_RUN_FOAM), data, DESCFLAGS_GET::NONE);
-	preRunFoam = data.GetBool();
-
-	mod->GetParameter(DescID(JACOBMAP), data, DESCFLAGS_GET::NONE);
-	jacobmaptag = (VertexColorTag*)data.GetLink(doc, Tvertexcolor);
-
-	mod->GetParameter(DescID(FOAMMAP), data, DESCFLAGS_GET::NONE);
-	foammaptag = (VertexColorTag*)data.GetLink(doc, Tvertexcolor);
-
-	mod->GetParameter(DescID(PSEL_PARTICLES), data, DESCFLAGS_GET::NONE);
-	stag = (SelectionTag*)data.GetLink(doc, Tpointselection);
-
-	mod->GetParameter(DescID(PSEL_THRES), data, DESCFLAGS_GET::NONE);
-	pselThres = data.GetFloat();
-
-	mod->GetParameter(DescID(JACOB_THRES), data, DESCFLAGS_GET::NONE);
-	jacobThres = data.GetFloat();
-
-	mod->GetParameter(DescID(FOAM_THRES), data, DESCFLAGS_GET::NONE);
-	foamThres = data.GetFloat();
-
-	mod->GetParameter(DescID(ACTIVE_DEFORM), data, DESCFLAGS_GET::NONE);
-	maxon::Bool doDeform = data.GetBool();
+	maxon::Bool doDeform = bc->GetBool(ACTIVE_DEFORM);
 
 	if (jacobmaptag)
 	{
