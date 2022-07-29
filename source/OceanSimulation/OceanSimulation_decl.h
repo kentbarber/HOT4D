@@ -1,3 +1,11 @@
+//  
+//  Created by Manuel MAGALHAES on 14/01/13.
+//  Copyright (c) 2013 Valkaari. All rights reserved.
+//
+//  Modified by Kent Barber on 29 /07/22.
+//  Copyright (c) 2022 GameLogicDesign Limited.All rights reserved.
+//
+
 #include "maxon/objectbase.h"
 #include "maxon/vector.h"
 #include "maxon/vector2d.h"
@@ -20,18 +28,11 @@ namespace OceanSimulation {
 		CATMULLROM
 	} MAXON_ENUM_LIST(INTERTYPE);
 
-
-
-
-
-
 	class OceanInterface : MAXON_INTERFACE_BASES(maxon::Object)
 	{
 		MAXON_INTERFACE(OceanInterface, MAXON_REFERENCE_NORMAL, "com.gamelogicdesign.OceanSimulation.interfaces.ocean");
 
-	public: 
-		
-
+	public:
 		//----------------------------------------------------------------------------------------
 		/// Init function to initialise ocean simulation
 		/// @param[in]  oceanResolution  : the ocean resolution in on direction M or N
@@ -48,7 +49,6 @@ namespace OceanSimulation {
 		MAXON_METHOD maxon::Result<void> Init(maxon::Int32 oceanResolution, maxon::Float oceanSize, maxon::Float shortestWaveLength,
 			maxon::Float amplitude, maxon::Float windSpeed, maxon::Float windDirection, maxon::Float alignement, maxon::Float damp,
 			maxon::Int32 seed);
-
 
 		//----------------------------------------------------------------------------------------
 		/// check if parameters inside object need to be updated
@@ -93,10 +93,7 @@ namespace OceanSimulation {
 		/// @return		maxon::OK on success
 		//----------------------------------------------------------------------------------------
 		MAXON_METHOD maxon::Result<void>			EvaluateUV(const INTERTYPE type, maxon::Vector2d uv, maxon::Vector &displacement, maxon::Vector &normal, maxon::Float &jMinus) const;
-
 	};
-
-	
 
 #include "OceanSimulation_decl1.hxx"
 

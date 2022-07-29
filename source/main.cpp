@@ -1,11 +1,14 @@
 /*
  *  main.cpp
- *  waves
  *
  *  Created by Manuel MAGALHAES on 23/12/10.
  *  Copyright 2010 Valkaari. All rights reserved.
+ * 
+ *  Modified by Kent Barber on 29/7/2022.
+ *  Copyright 2022 GameLogicDesign Limited. All rights reserved.
  *
  */
+
 #include "c4d.h"
 #include "main.h"
 

@@ -1,3 +1,10 @@
+//  
+//  Created by Manuel MAGALHAES on 14/01/13.
+//  Copyright (c) 2013 Valkaari. All rights reserved.
+//
+//  Modified by Kent Barber on 29 /07/22.
+//  Copyright (c) 2022 GameLogicDesign Limited.All rights reserved.
+//
 
 #include "c4d.h"
 #include "c4d_symbols.h"
@@ -20,41 +27,23 @@ Bool OceanSimulationEffector::GetDEnabling(GeListNode *node, const DescID &id, c
 	}
 
 	return SUPER::GetDEnabling(node, id, t_data, flags, itemdesc);
-
 }
 
-// Int32 	OceanSimulationEffector::GetEffectorFlags()
-// {
-//
-//	// don't work as i want =)
-//	return  EFFECTORFLAGS_TIMEDEPENDENT;
-// }
-
-
-
-
-Bool 	OceanSimulationEffector::AddToExecution(BaseObject *op, PriorityList *list)
+Bool OceanSimulationEffector::AddToExecution(BaseObject *op, PriorityList *list)
 {
 	list->Add(op, EXECUTIONPRIORITY_EXPRESSION, EXECUTIONFLAGS::NONE);
-
 	return true;
 }
 
-EXECUTIONRESULT 	OceanSimulationEffector::Execute(BaseObject *op, BaseDocument *doc, BaseThread *bt, Int32 priority, EXECUTIONFLAGS flags)
+EXECUTIONRESULT OceanSimulationEffector::Execute(BaseObject *op, BaseDocument *doc, BaseThread *bt, Int32 priority, EXECUTIONFLAGS flags)
 {
-
-	
-
 	if (priority != EXECUTIONPRIORITY_EXPRESSION)
 		return EXECUTIONRESULT::OK;
-	
 
 	maxon::Bool doAutoTime;
-
-	GeData							uiData;
+	GeData uiData;
 	op->GetParameter(DescID(AUTO_ANIM_TIME), uiData, DESCFLAGS_GET::NONE);
 	doAutoTime = uiData.GetBool();
-
 
 	if (doAutoTime)
 	{
@@ -70,22 +59,17 @@ EXECUTIONRESULT 	OceanSimulationEffector::Execute(BaseObject *op, BaseDocument *
 	}
 
 	return EXECUTIONRESULT::OK;
-
-
 }
-
 
 Bool OceanSimulationEffector::InitEffector(GeListNode* node)
 {
-	BaseObject		*op = (BaseObject*)node;
+	BaseObject *op = (BaseObject*)node;
 	if (!op)
 		return false;
-
 
 	BaseContainer *bc = op->GetDataInstance();
 	if (!bc)
 		return false;
-
 
 	op->SetParameter(DescID(OCEAN_RESOLUTION), GeData(7), DESCFLAGS_SET::NONE);
 	op->SetParameter(DescID(SEED), GeData(12345), DESCFLAGS_SET::NONE);
@@ -109,14 +93,12 @@ Bool OceanSimulationEffector::InitEffector(GeListNode* node)
 	op->SetParameter(DescID(JACOB_THRES), GeData(0.5), DESCFLAGS_SET::NONE);
 	op->SetParameter(DescID(FOAM_THRES), GeData(0.03), DESCFLAGS_SET::NONE);
 
-	
 	bc->SetFloat(ID_MG_BASEEFFECTOR_MINSTRENGTH, -1.0);
 	bc->SetBool(ID_MG_BASEEFFECTOR_POSITION_ACTIVE, true);
 	bc->SetVector(ID_MG_BASEEFFECTOR_POSITION, Vector(50.0));
 	
-	iferr_scope_handler{
+	iferr_scope_handler {
 		err.DiagOutput();
-		
 		return false;
 	};
 
@@ -125,21 +107,17 @@ Bool OceanSimulationEffector::InitEffector(GeListNode* node)
 		oceanSimulationRef_ = OceanSimulation::Ocean().Create() iferr_return;
 	}
 
-	
-
 	return true;
 }
 
 void OceanSimulationEffector::InitPoints(BaseObject* op, BaseObject* gen, BaseDocument* doc, EffectorDataStruct* data, MoData* md, BaseThread* thread)
 {
-	
 	BaseContainer* bc = op->GetDataInstance();
 	if (!bc)
 		return;
 
-	iferr_scope_handler{
+	iferr_scope_handler {
 		err.DiagOutput();
-		
 		return;
 	};
 
@@ -192,11 +170,8 @@ void OceanSimulationEffector::InitPoints(BaseObject* op, BaseObject* gen, BaseDo
 	op->GetParameter(DescID(TIMESCALE), uiData, DESCFLAGS_GET::NONE);
 	timeScale = uiData.GetFloat();
 
-
 	op->GetParameter(DescID(AUTO_ANIM_TIME), uiData, DESCFLAGS_GET::NONE);
 	doAutoTime = uiData.GetBool();
-
-	
 
 	if (!doAutoTime)
 	{
@@ -204,15 +179,8 @@ void OceanSimulationEffector::InitPoints(BaseObject* op, BaseObject* gen, BaseDo
 		currentTime_ = uiData.GetFloat();
 	}
 
-	
-
 	op->GetParameter(DescID(DO_CHOPYNESS), uiData, DESCFLAGS_GET::NONE);
 	doChopyness = uiData.GetBool();
-
-
-
-	
-
 
 	if (oceanSimulationRef_.NeedUpdate(oceanResolution, oceanSize, shrtWaveLenght, waveHeight, windSpeed, windDirection, windAlign, dampReflection, seed))
 	{
@@ -220,7 +188,6 @@ void OceanSimulationEffector::InitPoints(BaseObject* op, BaseObject* gen, BaseDo
 	}
 
 	oceanSimulationRef_.Animate(currentTime_, timeLoop, timeScale, oceanDepth, chopAmount, true, doChopyness, false, false) iferr_return;
-	
 }
 
 maxon::Result<void> OceanSimulationEffector::EvaluatePoint(BaseObject* op, const maxon::Vector p, maxon::Vector &displacement) const
@@ -230,11 +197,9 @@ maxon::Result<void> OceanSimulationEffector::EvaluatePoint(BaseObject* op, const
 	maxon::Float waveHeight;
 	maxon::Bool doCatmuInter;
 
-	GeData							uiData;
+	GeData uiData;
 	op->GetParameter(DescID(WAVE_HEIGHT), uiData, DESCFLAGS_GET::NONE);
 	waveHeight = uiData.GetFloat();
-
-
 
 	op->GetParameter(DescID(DO_CATMU_INTER), uiData, DESCFLAGS_GET::NONE);
 	doCatmuInter = uiData.GetBool();
@@ -247,32 +212,25 @@ maxon::Result<void> OceanSimulationEffector::EvaluatePoint(BaseObject* op, const
 	maxon::Float jMinus;
 	oceanSimulationRef_.EvaluatePoint(interType, p, displacement, normal, jMinus) iferr_return;
 	displacement /= waveHeight; // scale down the result by the wavelegnth so the result should be beetween -1 and 1
-	// jMinus /= waveHeight;
 	return  maxon::OK;
 }
 
 
 void OceanSimulationEffector::CalcPointValue(BaseObject* op, BaseObject* gen, BaseDocument* doc, EffectorDataStruct* data, Int32 index, MoData* md, const Vector& globalpos, Float fall_weight)
 {
-
-	
 	iferr_scope_handler
 	{
 		err.DbgStop();
 		return;
 	};
 	maxon::Vector disp;
-	
 
-	
 	EvaluatePoint(op, globalpos, disp) iferr_return;
 
 	EffectorStrengths* es = (EffectorStrengths*)data->strengths;
-	
 	es->pos = disp;
 	es->rot = disp;
 	es->scale = disp;
-
 }
 
 Vector OceanSimulationEffector::CalcPointColor(BaseObject* op, BaseObject* gen, BaseDocument* doc, EffectorDataStruct* data, Int32 index, MoData* md, const Vector& globalpos, Float fall_weight)
@@ -282,23 +240,15 @@ Vector OceanSimulationEffector::CalcPointColor(BaseObject* op, BaseObject* gen, 
 		err.DbgStop();
 		return Vector(0);
 	};
-	maxon::Vector disp;
-	
-	
 
+	maxon::Vector disp;
 	EvaluatePoint(op, globalpos, disp) iferr_return;
 
-
 	return disp;
-
 }
-
-
 
 Bool RegisterOceanSimulationEffector()
 {
 	return RegisterEffectorPlugin(GLD_ID_OCEAN_SIMULATION_EFFECTOR, "Ocean Simulation Effector"_s, OBJECT_CALL_ADDEXECUTION, OceanSimulationEffector::Alloc, "OOceanEffector"_s, AutoBitmap("hot4D_eff.tif"_s), 0);
 }
-
-
 
