@@ -47,9 +47,9 @@ EXECUTIONRESULT OceanSimulationEffector::Execute(BaseObject *op, BaseDocument *d
 		maxon::Float    currentFrame;
 		btCurrentTime = doc->GetTime();
 		currentFrame = (maxon::Float)btCurrentTime.GetFrame(doc->GetFps());
-		if (currentTime_ != currentFrame)
+		if (_currentTime != currentFrame)
 		{
-			currentTime_ = currentFrame;
+			_currentTime = currentFrame;
 			op->SetDirty(DIRTYFLAGS::DATA);
 		}
 	}
@@ -99,9 +99,9 @@ Bool OceanSimulationEffector::InitEffector(GeListNode* node)
 		return false;
 	};
 
-	if (oceanSimulationRef_ == nullptr)
+	if (_oceanSimulationRef == nullptr)
 	{
-		oceanSimulationRef_ = OceanSimulation::Ocean().Create() iferr_return;
+		_oceanSimulationRef = OceanSimulation::Ocean().Create() iferr_return;
 	}
 
 	return true;
@@ -118,9 +118,9 @@ void OceanSimulationEffector::InitPoints(BaseObject* op, BaseObject* gen, BaseDo
 		return;
 	};
 
-	if (oceanSimulationRef_ == nullptr)
+	if (_oceanSimulationRef == nullptr)
 	{
-		oceanSimulationRef_ = OceanSimulation::Ocean().Create() iferr_return;
+		_oceanSimulationRef = OceanSimulation::Ocean().Create() iferr_return;
 	}
 
 	Int32 oceanResolution = 1 << bc->GetInt32(OD_OCEAN_RESOLUTION);
@@ -140,17 +140,17 @@ void OceanSimulationEffector::InitPoints(BaseObject* op, BaseObject* gen, BaseDo
 
 	if (!doAutoTime)
 	{
-		currentTime_ = bc->GetFloat(OD_CURRENTTIME);
+		_currentTime = bc->GetFloat(OD_CURRENTTIME);
 	}
 
 	Bool doChopyness = bc->GetBool(OD_DO_CHOPYNESS);
 
-	if (oceanSimulationRef_.NeedUpdate(oceanResolution, oceanSize, shrtWaveLenght, waveHeight, windSpeed, windDirection, windAlign, dampReflection, seed))
+	if (_oceanSimulationRef.NeedUpdate(oceanResolution, oceanSize, shrtWaveLenght, waveHeight, windSpeed, windDirection, windAlign, dampReflection, seed))
 	{
-		oceanSimulationRef_.Init(oceanResolution, oceanSize, shrtWaveLenght, waveHeight, windSpeed, windDirection, windAlign, dampReflection, seed) iferr_return;
+		_oceanSimulationRef.Init(oceanResolution, oceanSize, shrtWaveLenght, waveHeight, windSpeed, windDirection, windAlign, dampReflection, seed) iferr_return;
 	}
 
-	oceanSimulationRef_.Animate(currentTime_, timeLoop, timeScale, oceanDepth, chopAmount, true, doChopyness, false, false) iferr_return;
+	_oceanSimulationRef.Animate(_currentTime, timeLoop, timeScale, oceanDepth, chopAmount, true, doChopyness, false, false) iferr_return;
 }
 
 maxon::Result<void> OceanSimulationEffector::EvaluatePoint(BaseObject* op, const maxon::Vector p, maxon::Vector &displacement) const
@@ -169,7 +169,7 @@ maxon::Result<void> OceanSimulationEffector::EvaluatePoint(BaseObject* op, const
 
 	maxon::Vector normal;
 	maxon::Float jMinus;
-	oceanSimulationRef_.EvaluatePoint(interType, p, displacement, normal, jMinus) iferr_return;
+	_oceanSimulationRef.EvaluatePoint(interType, p, displacement, normal, jMinus) iferr_return;
 	displacement /= waveHeight; // scale down the result by the wavelegnth so the result should be beetween -1 and 1
 	return  maxon::OK;
 }

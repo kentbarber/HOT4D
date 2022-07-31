@@ -157,8 +157,8 @@ Bool OceanSimulationDeformer::Init(GeListNode *node)
 	bc->SetFloat(OD_FOAM_THRES, 0.03);
 	bc->SetBool(OD_ACTIVE_DEFORM, true);
 
-	if (falloff_)
-		if (!falloff_->InitFalloff(bc, NULL, op))
+	if (_falloff)
+		if (!_falloff->InitFalloff(bc, NULL, op))
 			return false;
 
 	return true;
@@ -178,11 +178,11 @@ Bool OceanSimulationDeformer::GetDDescription(GeListNode *node, Description *des
 
 	//---------------------------------
 	// Add the falloff interface
-	if (falloff_)
+	if (_falloff)
 	{
-		if (!falloff_->SetMode(FIELDS, bc))
+		if (!_falloff->SetMode(FIELDS, bc))
 			return false; // The falloff parameters have to have been setup before it can be added to the description, this like makes sure of that
-		if (!falloff_->AddFalloffToDescription(description, bc, DESCFLAGS_DESC::NONE))
+		if (!_falloff->AddFalloffToDescription(description, bc, DESCFLAGS_DESC::NONE))
 			return false;
 	}
 
@@ -196,8 +196,8 @@ Bool OceanSimulationDeformer::CopyTo(NodeData *dest, GeListNode *snode, GeListNo
 	OceanSimulationDeformer *df = (OceanSimulationDeformer*)dest;
 	if (!df)
 		return false;
-	if (falloff_ && df->falloff_)
-		if (!falloff_->CopyTo(df->falloff_))
+	if (_falloff && df->_falloff)
+		if (!_falloff->CopyTo(df->_falloff))
 			return false;
 	return ObjectData::CopyTo(dest, snode, dnode, flags, trn);
 }
@@ -209,8 +209,8 @@ DRAWRESULT OceanSimulationDeformer::Draw(BaseObject *op, DRAWPASS drawpass, Base
 	BaseContainer *bc = op->GetDataInstance();
 	if (!bc)
 		return DRAWRESULT::FAILURE;
-	if (falloff_)
-		falloff_->Draw(bd, bh, drawpass, bc);
+	if (_falloff)
+		_falloff->Draw(bd, bh, drawpass, bc);
 	return ObjectData::Draw(op, drawpass, bd, bh);
 }
 
@@ -259,8 +259,8 @@ Int32 OceanSimulationDeformer::GetHandleCount(BaseObject *op)
 	BaseContainer *bc = op->GetDataInstance();
 	if (!bc)
 		return 0;
-	if (falloff_)
-		return falloff_->GetHandleCount(bc);
+	if (_falloff)
+		return _falloff->GetHandleCount(bc);
 	return 0;
 }
 
@@ -269,8 +269,8 @@ void OceanSimulationDeformer::GetHandle(BaseObject *op, Int32 i, HandleInfo &inf
 	BaseContainer *bc = op->GetDataInstance();
 	if (!bc)
 		return;
-	if (falloff_)
-		falloff_->GetHandle(i, bc, info);
+	if (_falloff)
+		_falloff->GetHandle(i, bc, info);
 }
 
 void OceanSimulationDeformer::SetHandle(BaseObject *op, Int32 i, Vector p, const HandleInfo &info)
@@ -278,21 +278,21 @@ void OceanSimulationDeformer::SetHandle(BaseObject *op, Int32 i, Vector p, const
 	BaseContainer *bc = op->GetDataInstance();
 	if (!bc)
 		return;
-	if (falloff_)
-		falloff_->SetHandle(i, p, bc, info);
+	if (_falloff)
+		_falloff->SetHandle(i, p, bc, info);
 }
 
 void OceanSimulationDeformer::CheckDirty(BaseObject* op, BaseDocument* doc)
 {
 	// fields
-	if (falloff_)
+	if (_falloff)
 	{
 		BaseContainer *data = op->GetDataInstance();
-		Int32 dirty = falloff_->GetDirty(doc, data);
-		if (dirty != falloffDirtyCheck_)
+		Int32 dirty = _falloff->GetDirty(doc, data);
+		if (dirty != _falloffDirtyCheck)
 		{
 			op->SetDirty(DIRTYFLAGS::DATA);
-			falloffDirtyCheck_ = dirty;
+			_falloffDirtyCheck = dirty;
 		}
 	}
 
@@ -307,9 +307,9 @@ void OceanSimulationDeformer::CheckDirty(BaseObject* op, BaseDocument* doc)
 	{
 		BaseTime		btCurrentTime = doc->GetTime();
 		maxon::Float    currentFrame = btCurrentTime.GetFrame(doc->GetFps());
-		if (currentTime_ != currentFrame)
+		if (_currentTime != currentFrame)
 		{
-			currentTime_ = currentFrame;
+			_currentTime = currentFrame;
 			op->SetDirty(DIRTYFLAGS::DATA);
 		}
 	}
@@ -322,7 +322,7 @@ Bool OceanSimulationDeformer::ModifyObject(BaseObject *mod, BaseDocument *doc, B
 		return false;
 	};
 
-	if (!op->IsInstanceOf(Opoint) || !falloff_)
+	if (!op->IsInstanceOf(Opoint) || !_falloff)
 		return true;
 
 	maxon::Int32                    pcnt;
@@ -378,7 +378,7 @@ Bool OceanSimulationDeformer::ModifyObject(BaseObject *mod, BaseDocument *doc, B
 	if (!doAutoTime)
 	{
 		// currentTime is set in checkDirty
-		currentTime_ = bc->GetFloat(OD_CURRENTTIME);
+		_currentTime = bc->GetFloat(OD_CURRENTTIME);
 	}
 
 	doCatmuInter = bc->GetBool(OD_DO_CATMU_INTER);
@@ -432,20 +432,20 @@ Bool OceanSimulationDeformer::ModifyObject(BaseObject *mod, BaseDocument *doc, B
 			bsp->DeselectAll();
 	}
 
-	if (oceanSimulationRef_ == nullptr)
+	if (_oceanSimulationRef == nullptr)
 	{
-		oceanSimulationRef_ = OceanSimulation::Ocean().Create() iferr_return;
+		_oceanSimulationRef = OceanSimulation::Ocean().Create() iferr_return;
 	}
 
-	if (oceanSimulationRef_.NeedUpdate(oceanResolution, oceanSize, shrtWaveLenght, waveHeight, windSpeed, windDirection, windAlign, dampReflection, seed))
+	if (_oceanSimulationRef.NeedUpdate(oceanResolution, oceanSize, shrtWaveLenght, waveHeight, windSpeed, windDirection, windAlign, dampReflection, seed))
 	{
-		oceanSimulationRef_.Init(oceanResolution, oceanSize, shrtWaveLenght, waveHeight, windSpeed, windDirection, windAlign, dampReflection, seed) iferr_return;
+		_oceanSimulationRef.Init(oceanResolution, oceanSize, shrtWaveLenght, waveHeight, windSpeed, windDirection, windAlign, dampReflection, seed) iferr_return;
 	}
 
-	oceanSimulationRef_.Animate(currentTime_, timeLoop, timeScale, oceanDepth, chopAmount, true, doChopyness, doJacobian, doNormals) iferr_return;
+	_oceanSimulationRef.Animate(_currentTime, timeLoop, timeScale, oceanDepth, chopAmount, true, doChopyness, doJacobian, doNormals) iferr_return;
 
 	FieldInput inputs(padr, pcnt, op_mg);
-	Bool outputsOK = falloff_->PreSample(doc, mod, inputs, FIELDSAMPLE_FLAG::VALUE);
+	Bool outputsOK = _falloff->PreSample(doc, mod, inputs, FIELDSAMPLE_FLAG::VALUE);
 
 	OceanSimulation::INTERTYPE interType = OceanSimulation::INTERTYPE::LINEAR;
 	if (doCatmuInter)
@@ -470,11 +470,11 @@ Bool OceanSimulationDeformer::ModifyObject(BaseObject *mod, BaseDocument *doc, B
 		maxon::Vector disp, normal, dispValue;
 		maxon::Float jMinus;
 
-		oceanSimulationRef_.EvaluatePoint(interType, p, disp, normal, jMinus) iferr_return;
+		_oceanSimulationRef.EvaluatePoint(interType, p, disp, normal, jMinus) iferr_return;
 
 		Float fallOffSampleValue(1.0);
 		if (outputsOK)
-			falloff_->Sample(p, &fallOffSampleValue, true, 0.0, nullptr, i);
+			_falloff->Sample(p, &fallOffSampleValue, true, 0.0, nullptr, i);
 		disp *= fallOffSampleValue;
 
 		if (weight)
@@ -529,7 +529,7 @@ Bool OceanSimulationDeformer::ModifyObject(BaseObject *mod, BaseDocument *doc, B
 
 	if (foammaptag && foampoint && jacobpoint && jacobmaptag && doJacobian)
 	{
-		if (preRunFoam && doAutoTime && currentTime_ == 0.0)
+		if (preRunFoam && doAutoTime && _currentTime == 0.0)
 		{
 			// run simulation for xx frame and get the jminus vertex map from here.
 			// only available in autoTime mode and frame 0.0  (or time offset if implemented)
@@ -550,7 +550,7 @@ Bool OceanSimulationDeformer::ModifyObject(BaseObject *mod, BaseDocument *doc, B
 			for (maxon::Int32 j = -90; j <= 0; j++)
 			{
 				// animate the ocean 
-				oceanSimulationRef_.Animate(j, timeLoop, timeScale, oceanDepth, chopAmount, true, doChopyness, doJacobian, doNormals) iferr_return;
+				_oceanSimulationRef.Animate(j, timeLoop, timeScale, oceanDepth, chopAmount, true, doChopyness, doJacobian, doNormals) iferr_return;
 
 				auto getJminus = [this, &padr, &interType, &weight, &storeJminus](maxon::Int32 i)
 				{
@@ -563,7 +563,7 @@ Bool OceanSimulationDeformer::ModifyObject(BaseObject *mod, BaseDocument *doc, B
 					maxon::Vector disp, normal;
 					maxon::Float jMinus;
 
-					oceanSimulationRef_.EvaluatePoint(interType, p, disp, normal, jMinus) iferr_return;
+					_oceanSimulationRef.EvaluatePoint(interType, p, disp, normal, jMinus) iferr_return;
 					maxon::Float jMinusValue = -jMinus;
 					if (weight)
 						jMinusValue *= weight[i];

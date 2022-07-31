@@ -14,12 +14,12 @@ class OceanSimulationDeformer : public ObjectData
 	
 private:
 	// This is where all the wave action takes place
-	maxon::Float						currentTime_; ///< store the current time of the animation used in check dirty
-	OceanSimulation::OceanRef			oceanSimulationRef_; ///< ocean reference
+	maxon::Float						_currentTime; ///< store the current time of the animation used in check dirty
+	OceanSimulation::OceanRef			_oceanSimulationRef; ///< ocean reference
 
 	// manage falloff
-	AutoAlloc<C4D_Falloff>		falloff_; ///< the falloff object to be compatible with fields.
-	maxon::Int32				falloffDirtyCheck_; ///< store the checkdirty to see if the fields have changed.
+	AutoAlloc<C4D_Falloff>		_falloff; ///< the falloff object to be compatible with fields.
+	maxon::Int32				_falloffDirtyCheck; ///< store the checkdirty to see if the fields have changed.
 	
 	maxon::Float				MapRange(maxon::Float value, const maxon::Float min_input, const maxon::Float max_input, const maxon::Float min_output, const maxon::Float max_output) const;
 

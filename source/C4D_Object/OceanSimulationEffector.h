@@ -24,8 +24,8 @@ public:
 	static NodeData* Alloc() { return NewObjClear(OceanSimulationEffector); }
 
 private:
-	OceanSimulation::OceanRef  oceanSimulationRef_; ///< the reference to the ocean simulation
-	maxon::Float currentTime_; ///< store the current time of the animation used in check dirty
+	OceanSimulation::OceanRef  _oceanSimulationRef; ///< the reference to the ocean simulation
+	maxon::Float _currentTime; ///< store the current time of the animation used in check dirty
 
 	//----------------------------------------------------------------------------------------
 	/// Evaluate the result of the simulation and return the vectors for displacement, normals and jacobian
