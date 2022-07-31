@@ -60,7 +60,7 @@ Bool OceanSimulationDeformer::Message(GeListNode *node, Int32 type, void *t_data
 		DescriptionCommand* dc = (DescriptionCommand*)t_data;
 		switch (dc->_descId[0].id)
 		{
-		case CREATE_FOAM_TAGS:
+		case OD_CREATE_FOAM_TAGS:
 		{
 			BaseObject* pParent = op->GetUp();
 			if (pParent && pParent->GetType() == Opolygon)
@@ -82,7 +82,7 @@ Bool OceanSimulationDeformer::Message(GeListNode *node, Int32 type, void *t_data
 						pParent->InsertTag(pJacobTag);
 
 						doc->AddUndo(UNDOTYPE::CHANGE, op);
-						op->SetParameter(JACOBMAP, pJacobTag, DESCFLAGS_SET::FORCESET);
+						op->SetParameter(OD_JACOBMAP, pJacobTag, DESCFLAGS_SET::FORCESET);
 					}
 
 					VertexColorTag* pFoamTag = VertexColorTag::Alloc(pcnt);
@@ -95,7 +95,7 @@ Bool OceanSimulationDeformer::Message(GeListNode *node, Int32 type, void *t_data
 						pParent->InsertTag(pFoamTag);
 
 						doc->AddUndo(UNDOTYPE::CHANGE, op);
-						op->SetParameter(FOAMMAP, pFoamTag, DESCFLAGS_SET::FORCESET);
+						op->SetParameter(OD_FOAMMAP, pFoamTag, DESCFLAGS_SET::FORCESET);
 					}
 
 					doc->SetActiveTag(pFoamTag);
@@ -133,29 +133,29 @@ Bool OceanSimulationDeformer::Init(GeListNode *node)
 	BaseObject		*op = (BaseObject*)node;
 	BaseContainer *bc = op->GetDataInstance();
 
-	bc->SetInt32(OCEAN_RESOLUTION, 7);
-	bc->SetInt32(SEED, 12345);
-	bc->SetFloat(OCEAN_SIZE, 400.0);
-	bc->SetFloat(WIND_SPEED, 20.0);
-	bc->SetFloat(WIND_DIRECTION, 120.0);
-	bc->SetFloat(SHRT_WAVELENGHT, 0.01);
-	bc->SetFloat(WAVE_HEIGHT, 30.0);
-	bc->SetFloat(CHOPAMOUNT, 0.5);
-	bc->SetFloat(DAMP_REFLECT, 1.0);
-	bc->SetFloat(WIND_ALIGNMENT, 1.0);
-	bc->SetFloat(OCEAN_DEPTH, 200.0);
-	bc->SetFloat(CURRENTTIME, 0.0);
-	bc->SetInt32(TIMELOOP, 90);
-	bc->SetFloat(TIMESCALE, 0.5);
-	bc->SetBool(AUTO_ANIM_TIME, true);
-	bc->SetBool(PRE_RUN_FOAM, false);
-	bc->SetBool(DO_CATMU_INTER, false);
-	bc->SetBool(DO_JACOBIAN, false);
-	bc->SetBool(DO_CHOPYNESS, true);
-	bc->SetFloat(PSEL_THRES, 0.1);
-	bc->SetFloat(JACOB_THRES, 0.5);
-	bc->SetFloat(FOAM_THRES, 0.03);
-	bc->SetBool(ACTIVE_DEFORM, true);
+	bc->SetInt32(OD_OCEAN_RESOLUTION, 7);
+	bc->SetInt32(OD_SEED, 12345);
+	bc->SetFloat(OD_OCEAN_SIZE, 400.0);
+	bc->SetFloat(OD_WIND_SPEED, 20.0);
+	bc->SetFloat(OD_WIND_DIRECTION, 120.0);
+	bc->SetFloat(OD_SHRT_WAVELENGHT, 0.01);
+	bc->SetFloat(OD_WAVE_HEIGHT, 30.0);
+	bc->SetFloat(OD_CHOPAMOUNT, 0.5);
+	bc->SetFloat(OD_DAMP_REFLECT, 1.0);
+	bc->SetFloat(OD_WIND_ALIGNMENT, 1.0);
+	bc->SetFloat(OD_OCEAN_DEPTH, 200.0);
+	bc->SetFloat(OD_CURRENTTIME, 0.0);
+	bc->SetInt32(OD_TIMELOOP, 90);
+	bc->SetFloat(OD_TIMESCALE, 0.5);
+	bc->SetBool(OD_AUTO_ANIM_TIME, true);
+	bc->SetBool(OD_PRE_RUN_FOAM, false);
+	bc->SetBool(OD_DO_CATMU_INTER, false);
+	bc->SetBool(OD_DO_JACOBIAN, false);
+	bc->SetBool(OD_DO_CHOPYNESS, true);
+	bc->SetFloat(OD_PSEL_THRES, 0.1);
+	bc->SetFloat(OD_JACOB_THRES, 0.5);
+	bc->SetFloat(OD_FOAM_THRES, 0.03);
+	bc->SetBool(OD_ACTIVE_DEFORM, true);
 
 	if (falloff_)
 		if (!falloff_->InitFalloff(bc, NULL, op))
@@ -230,24 +230,24 @@ Bool OceanSimulationDeformer::GetDEnabling(GeListNode *node, const DescID &id, c
 		parentIsPolygon = true;
 	}
 
-	Bool doJacobian = bc->GetBool(DO_JACOBIAN);
-	Bool autoAnimTime = bc->GetBool(AUTO_ANIM_TIME);
-	Bool chopyness = bc->GetBool(DO_CHOPYNESS);
+	Bool doJacobian = bc->GetBool(OD_DO_JACOBIAN);
+	Bool autoAnimTime = bc->GetBool(OD_AUTO_ANIM_TIME);
+	Bool chopyness = bc->GetBool(OD_DO_CHOPYNESS);
 
 	switch (id[0].id)
 	{
-	case CURRENTTIME:
+	case OD_CURRENTTIME:
 		return !autoAnimTime;
-	case JACOBMAP:
-	case JACOB_THRES:
-	case FOAMMAP:
-	case FOAM_THRES:
+	case OD_JACOBMAP:
+	case OD_JACOB_THRES:
+	case OD_FOAMMAP:
+	case OD_FOAM_THRES:
 		return doJacobian && parentIsPolygon;
-	case CREATE_FOAM_TAGS:
+	case OD_CREATE_FOAM_TAGS:
 		return doJacobian;
-	case PRE_RUN_FOAM:
+	case OD_PRE_RUN_FOAM:
 		return doJacobian && parentIsPolygon && autoAnimTime;
-	case CHOPAMOUNT:
+	case OD_CHOPAMOUNT:
 		return chopyness;
 	}
 
@@ -300,7 +300,7 @@ void OceanSimulationDeformer::CheckDirty(BaseObject* op, BaseDocument* doc)
 	maxon::Bool						doAutoTime;
 	GeData							data;
 
-	op->GetParameter(DescID(AUTO_ANIM_TIME), data, DESCFLAGS_GET::NONE);
+	op->GetParameter(DescID(OD_AUTO_ANIM_TIME), data, DESCFLAGS_GET::NONE);
 	doAutoTime = data.GetBool();
 
 	if (doAutoTime)
@@ -360,40 +360,40 @@ Bool OceanSimulationDeformer::ModifyObject(BaseObject *mod, BaseDocument *doc, B
 
 	BaseContainer* bc = mod->GetDataInstance();
 
-	oceanResolution = 1 << bc->GetInt32(OCEAN_RESOLUTION);
-	oceanSize = bc->GetFloat(OCEAN_SIZE);
-	shrtWaveLenght = bc->GetFloat(SHRT_WAVELENGHT);
-	waveHeight = bc->GetFloat(WAVE_HEIGHT);
-	windSpeed = bc->GetFloat(WIND_SPEED);
-	windDirection = DegToRad(bc->GetFloat(WIND_DIRECTION));
-	windAlign = bc->GetFloat(WIND_ALIGNMENT);
-	dampReflection = bc->GetFloat(DAMP_REFLECT);
-	seed = bc->GetInt32(SEED);
-	oceanDepth = bc->GetFloat(OCEAN_DEPTH);
-	chopAmount = bc->GetFloat(CHOPAMOUNT);
-	timeLoop = bc->GetInt32(TIMELOOP);
-	timeScale = bc->GetFloat(TIMESCALE);
-	doAutoTime = bc->GetBool(AUTO_ANIM_TIME);
+	oceanResolution = 1 << bc->GetInt32(OD_OCEAN_RESOLUTION);
+	oceanSize = bc->GetFloat(OD_OCEAN_SIZE);
+	shrtWaveLenght = bc->GetFloat(OD_SHRT_WAVELENGHT);
+	waveHeight = bc->GetFloat(OD_WAVE_HEIGHT);
+	windSpeed = bc->GetFloat(OD_WIND_SPEED);
+	windDirection = DegToRad(bc->GetFloat(OD_WIND_DIRECTION));
+	windAlign = bc->GetFloat(OD_WIND_ALIGNMENT);
+	dampReflection = bc->GetFloat(OD_DAMP_REFLECT);
+	seed = bc->GetInt32(OD_SEED);
+	oceanDepth = bc->GetFloat(OD_OCEAN_DEPTH);
+	chopAmount = bc->GetFloat(OD_CHOPAMOUNT);
+	timeLoop = bc->GetInt32(OD_TIMELOOP);
+	timeScale = bc->GetFloat(OD_TIMESCALE);
+	doAutoTime = bc->GetBool(OD_AUTO_ANIM_TIME);
 
 	if (!doAutoTime)
 	{
 		// currentTime is set in checkDirty
-		currentTime_ = bc->GetFloat(CURRENTTIME);
+		currentTime_ = bc->GetFloat(OD_CURRENTTIME);
 	}
 
-	doCatmuInter = bc->GetBool(DO_CATMU_INTER);
-	doJacobian = bc->GetBool(DO_JACOBIAN);
-	doChopyness = bc->GetBool(DO_CHOPYNESS);
-	doNormals = bc->GetBool(DO_NORMALS) && !doChopyness; // why choppyness ???  normals are not used !!
-	preRunFoam = bc->GetBool(PRE_RUN_FOAM);
-	jacobmaptag = (VertexColorTag*)bc->GetLink(JACOBMAP, doc, Tvertexcolor);
-	foammaptag = (VertexColorTag*)bc->GetLink(FOAMMAP, doc, Tvertexcolor);
-	stag = (SelectionTag*)bc->GetLink(PSEL_PARTICLES, doc, Tpointselection);
-	pselThres = bc->GetFloat(PSEL_THRES);
-	jacobThres = bc->GetFloat(JACOB_THRES);
-	foamThres = bc->GetFloat(FOAM_THRES);
+	doCatmuInter = bc->GetBool(OD_DO_CATMU_INTER);
+	doJacobian = bc->GetBool(OD_DO_JACOBIAN);
+	doChopyness = bc->GetBool(OD_DO_CHOPYNESS);
+	doNormals = bc->GetBool(OD_DO_NORMALS) && !doChopyness; // why choppyness ???  normals are not used !!
+	preRunFoam = bc->GetBool(OD_PRE_RUN_FOAM);
+	jacobmaptag = (VertexColorTag*)bc->GetLink(OD_JACOBMAP, doc, Tvertexcolor);
+	foammaptag = (VertexColorTag*)bc->GetLink(OD_FOAMMAP, doc, Tvertexcolor);
+	stag = (SelectionTag*)bc->GetLink(OD_PSEL_PARTICLES, doc, Tpointselection);
+	pselThres = bc->GetFloat(OD_PSEL_THRES);
+	jacobThres = bc->GetFloat(OD_JACOB_THRES);
+	foamThres = bc->GetFloat(OD_FOAM_THRES);
 
-	maxon::Bool doDeform = bc->GetBool(ACTIVE_DEFORM);
+	maxon::Bool doDeform = bc->GetBool(OD_ACTIVE_DEFORM);
 
 	if (jacobmaptag)
 	{
