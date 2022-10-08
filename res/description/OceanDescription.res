@@ -48,7 +48,7 @@ CONTAINER OceanDescription
 
 		BOOL OD_DO_CATMU_INTER { }
 		
-		// BOOL DO_NORMALS {  }
+		// BOOL OD_DO_NORMALS {  }
 		
 		SEPARATOR { LINE; }
 		
